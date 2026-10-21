@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Я Спартанец",
+    "slug": "ya-spartanets",
+    "scheme": "yaspartanets",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "android": {
+      "package": "ru.moscowspartans.app"
+    },
+    "ios": {
+      "bundleIdentifier": "ru.moscowspartans.app",
+      "supportsTablet": true
+    },
+    "plugins": []
+  }
+}
