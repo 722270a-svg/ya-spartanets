@@ -31,6 +31,10 @@ jobs:
           CI: '1'
           EXPO_NO_DOTENV: '1'
       - run: python3 tests/check_web_build.py
+      - name: Publish club branding images
+        run: |
+          mkdir -p dist/web/branding
+          if [ -d assets/branding ]; then cp assets/branding/* dist/web/branding/; fi
       - name: Keep Expo asset directories on Pages
         run: touch dist/web/.nojekyll
       - uses: actions/upload-pages-artifact@v3
