@@ -69,7 +69,7 @@ export default function App(){
  const Chip=({text}:{text:string})=><View style={styles.chip}><Text style={styles.chipText}>{text}</Text></View>;
  const Heading=({children}:{children:React.ReactNode})=><Text style={styles.heading}>{children}</Text>;
  if(busy)return <SafeAreaView style={styles.root}><Text style={styles.hero}>Я СПАРТАНЕЦ</Text></SafeAreaView>;
- if(!account)return <SafeAreaView style={styles.root}><StatusBar barStyle="light-content"/><ScrollView contentContainerStyle={styles.content}>
+ if(!account)return <SafeAreaView style={styles.root}><StatusBar barStyle="light-content"/><ScrollView key={!entryRole?"select-role":!onboardingDone?"read-regulation":entryRole==="player"&&!playerUnit?"select-team":"enter-account"} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
  <View style={styles.entryHead}><Image source={brandImage('logo-spartans.png')} resizeMode="contain" style={styles.entryLogo}/><Text style={styles.brand}>МОСКОВСКИЕ СПАРТАНЦЫ</Text><Text style={styles.hero}>Я СПАРТАНЕЦ</Text><Text style={styles.muted}>Единый клуб. Три пути. Одна команда.</Text></View>
  {!entryRole?<><Text style={styles.sectionLabel}>ВЫБЕРИ СВОЮ РОЛЬ</Text>
  {([['recruit','РЕКРУТ','Программа новичка, задачи, путь в команду'],['player','ИГРОК','Команда, тренировки и личный прогресс'],['coach','ТРЕНЕР','Заявки, состав и управление доступами']] as const).map(([role,title,description])=><TouchableOpacity key={role} style={styles.entryCard} onPress={()=>{setEntryRole(role);setOnboardingError('');setOnboardingDone(false);setPlayerUnit(null)}}><View style={{flex:1,gap:7}}><Text style={styles.entryRole}>{title}</Text><Text style={styles.muted}>{description}</Text></View><Text style={styles.trainingArrow}>→</Text></TouchableOpacity>)}
