@@ -7,7 +7,7 @@ import sessions from './src/data/sessions.json';
 import {regulationSections,regulationTitle,regulationVersion} from './src/data/clubRegulation';
 
 type Screen = 'home'|'course'|'lesson'|'tasks'|'profile'|'trainer'|'levels'|'documents';
-type Account = {name:string;email:string;status:'pending'|'approved';role:'recruit'|'player'|'coach'};
+type Account = {name:string;email:string;status:'pending'|'approved';role:'recruit'|'player'|'coach';unit?:'offense'|'defense'|'special'};
 const BRAND_ASSETS='https://722270a-svg.github.io/ya-spartanets/branding/';
 const brandImage=(name:string)=>({uri:BRAND_ASSETS+name});
 const GOLD='#DEB967', BG='#101010', PANEL='#1D1D1D', MUTED='#A5A5A5';
@@ -27,6 +27,7 @@ export default function App(){
  const [attendance,setAttendance]=useState<string[]>([]);
  const [trainingDate,setTrainingDate]=useState('');
  const [onboardingDone,setOnboardingDone]=useState(false);
+ const [playerUnit,setPlayerUnit]=useState<'offense'|'defense'|'special'|null>(null);
  const [identity,setIdentity]=useState({fullName:'',passportSeries:'',passportNumber:'',passportIssuedBy:'',passportIssuedDate:'',address:''});
  const updateIdentity=(field:keyof typeof identity,value:string)=>setIdentity(v=>({...v,[field]:value}));
  const [account,setAccount]=useState<Account|null>(null);
@@ -77,14 +78,17 @@ export default function App(){
  {documentContent(true)}
  <TouchableOpacity accessibilityRole="checkbox" accessibilityState={{checked:readConfirmed}} onPress={()=>setReadConfirmed(v=>!v)} style={styles.trainingRow}><Text style={styles.trainingIndexText}>{readConfirmed?'☑':'☐'}</Text><Text style={[styles.body,{flex:1}]}>Я ознакомился(-ась) с полным текстом регламента команды.</Text></TouchableOpacity>
  <TouchableOpacity disabled={!readConfirmed} style={[styles.button,!readConfirmed&&{opacity:0.45}]} onPress={()=>{if(!identity.fullName.trim()||!identity.passportSeries.trim()||!identity.passportNumber.trim()||!identity.passportIssuedBy.trim()||!identity.passportIssuedDate.trim()||!identity.address.trim()){Alert.alert('Заполни поля','Заполни все поля демонстрационной формы, используя только вымышленные данные.');return;}setName(identity.fullName.trim());setOnboardingDone(true);setReadConfirmed(false);}}><Text style={styles.buttonText}>ПОДТВЕРДИТЬ И ПРОДОЛЖИТЬ</Text></TouchableOpacity></View>:
- <View style={styles.card}><TouchableOpacity onPress={()=>{setOnboardingDone(false);setReadConfirmed(false)}}><Text style={styles.gold}>‹ К ДОКУМЕНТУ</Text></TouchableOpacity><Text style={styles.sectionLabel}>ШАГ 2 ИЗ 2: ВХОД</Text>
+ <View style={styles.card}><TouchableOpacity onPress={()=>{setOnboardingDone(false);setPlayerUnit(null);setReadConfirmed(false)}}><Text style={styles.gold}>‹ К ДОКУМЕНТУ</Text></TouchableOpacity>{entryRole==='player'&&!playerUnit?<><Text style={styles.sectionLabel}>ШАГ 2 ИЗ 3: ВЫБОР КОМАНДЫ</Text><Text style={styles.muted}>Выбери направление. В демонстрационной версии это предварительный выбор, который в дальнейшем подтвердит тренер.</Text>{([['offense','КОМАНДА НАПАДЕНИЯ','Нападение и продвижение мяча'],['defense','КОМАНДА ЗАЩИТЫ','Защита и остановка соперника'],['special','СПЕЦКОМАНДА','Возвраты, удары и специальные розыгрыши']] as const).map(([unit,title,caption])=><TouchableOpacity key={unit} style={styles.entryCard} onPress={()=>setPlayerUnit(unit)}><View style={{flex:1,gap:6}}><Text style={styles.entryRole}>{title}</Text><Text style={styles.muted}>{caption}</Text></View><Text style={styles.trainingArrow}>→</Text></TouchableOpacity>)}</>:<>
+ {entryRole==='player'&&<TouchableOpacity onPress={()=>setPlayerUnit(null)}><Text style={styles.gold}>‹ ИЗМЕНИТЬ КОМАНДУ</Text></TouchableOpacity>}
+ <Text style={styles.sectionLabel}>{entryRole==='player'?'ШАГ 3 ИЗ 3: ВХОД':'ШАГ 2 ИЗ 2: ВХОД'}</Text>
+ {entryRole==='player'&&<Text style={styles.infoPrimary}>Выбрано: {playerUnit==='offense'?'Команда нападения':playerUnit==='defense'?'Команда защиты':'Спецкоманда'}</Text>}
  <Heading>{entryRole==='recruit'?'Заявка рекрута':entryRole==='player'?'Вход игрока':'Вход тренера'}</Heading>
  <Text style={styles.muted}>ДЕМО-РЕЖИМ. Используй только вымышленные сведения. Настоящая авторизация и выдача ролей на сервере пока отсутствуют.</Text>
  <Text style={styles.body}>ФИО: {identity.fullName}</Text>
  <TextInput style={styles.input} placeholder="Тестовая электронная почта" placeholderTextColor="#777" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail}/>
  <TextInput style={styles.input} placeholder="Пароль (поле недоступно в демо)" placeholderTextColor="#777" editable={false} secureTextEntry/>
- <Button label={entryRole==='recruit'?'ОТПРАВИТЬ ДЕМО-ЗАЯВКУ':entryRole==='player'?'ДЕМО: ВОЙТИ ИГРОКОМ':'ДЕМО: ОТКРЫТЬ ПАНЕЛЬ ТРЕНЕРА'} click={()=>{if(!/^\S+@\S+\.\S+$/.test(email.trim())){Alert.alert('Проверь данные','Укажи корректную тестовую почту');return;}saveAccount({name:identity.fullName.trim(),email:email.trim(),status:entryRole==='recruit'?'pending':'approved',role:entryRole});setDocumentAcks([]);setIdentity({fullName:'',passportSeries:'',passportNumber:'',passportIssuedBy:'',passportIssuedDate:'',address:''});setOnboardingDone(false);setScreen('home');}}/>
- </View>}
+ <Button label={entryRole==='recruit'?'ОТПРАВИТЬ ДЕМО-ЗАЯВКУ':entryRole==='player'?'ДЕМО: ВОЙТИ ИГРОКОМ':'ДЕМО: ОТКРЫТЬ ПАНЕЛЬ ТРЕНЕРА'} click={()=>{if(!/^\S+@\S+\.\S+$/.test(email.trim())){Alert.alert('Проверь данные','Укажи корректную тестовую почту');return;}saveAccount({name:identity.fullName.trim(),email:email.trim(),status:entryRole==='recruit'?'pending':'approved',role:entryRole,unit:entryRole==='player'?playerUnit??undefined:undefined});setDocumentAcks([]);setIdentity({fullName:'',passportSeries:'',passportNumber:'',passportIssuedBy:'',passportIssuedDate:'',address:''});setOnboardingDone(false);setScreen('home');}}/>
+ </> </View>}
  </>} </ScrollView></SafeAreaView>;
   if(account.status==='pending')return <SafeAreaView style={styles.root}><ScrollView contentContainerStyle={styles.content}><Text style={styles.brand}>Я СПАРТАНЕЦ</Text><Text style={styles.hero}>Заявка отправлена</Text><Text style={styles.muted}>Привет, {account.name}. Сейчас твой статус - «Ожидает подтверждения тренера».</Text><View style={styles.card}><Chip text="ОЖИДАЕТ ПОДТВЕРЖДЕНИЯ"/><Text style={styles.body}>В реальной версии тренер получит заявку в своей панели. После подтверждения откроется личный кабинет рекрута.</Text><Button label="Демо: тренер подтвердил заявку" click={()=>saveAccount({...account,status:'approved'})}/><Button label="Сбросить демо-регистрацию" outline click={()=>saveAccount(null)}/></View></ScrollView></SafeAreaView>;
  const selected=sessions.find(x=>x.id===lesson)!;
@@ -146,6 +150,7 @@ export default function App(){
  {screen==='tasks'&&<><Text style={styles.hero}>МОИ ЗАДАЧИ</Text>{initialTasks.map((t,i)=><TouchableOpacity key={i} style={styles.lessonLine} onPress={()=>toggleTask(i)}><Text style={styles.body}>{checked.includes(i)?'☑':'☐'}  {t}</Text></TouchableOpacity>)}<Text style={styles.muted}>Демо-список. Назначение задач тренером будет реализовано через сервер.</Text></>}
  {screen==='profile'&&<>
  <ImageBackground source={brandImage('player-rain.jpg')} resizeMode="cover" style={styles.profileHero}><View style={styles.photoOverlay}/><Text style={styles.bannerMini}>МОСКОВСКИЕ СПАРТАНЦЫ · ЛИЧНОЕ ДЕЛО</Text><Text style={styles.profileBackdrop}>07</Text><View style={styles.avatar}><Text style={styles.avatarLetter}>{account.name.charAt(0).toUpperCase()}</Text></View><Text style={styles.profileLabel}>МОЯ КОМАНДА - МОЯ ИСТОРИЯ</Text><Text style={styles.profileTitle}>{account.name.toUpperCase()}</Text><View style={styles.profileRole}><Text style={styles.profileRoleText}>{account.role==='coach'?'ТРЕНЕР':account.role==='player'?'ИГРОК':'РЕКРУТ'} · ДОСТУП ПОДТВЕРЖДЁН</Text></View></ImageBackground>
+ {account.role==='player'&&<View style={styles.infoCard}><Text style={styles.sectionLabel}>МОЁ НАПРАВЛЕНИЕ</Text><Text style={styles.infoPrimary}>{account.unit==='offense'?'Команда нападения':account.unit==='defense'?'Команда защиты':account.unit==='special'?'Спецкоманда':'Не выбрано'}</Text><Text style={styles.muted}>Выбор направления в демоверсии. Окончательное назначение подтверждает тренер.</Text></View>}
  <View style={styles.sectionBar}><Text style={styles.sectionLabel}>КАРТОЧКА ИГРОКА</Text><Text style={styles.sectionCounter}>01 / 02</Text></View>
  <View style={styles.infoCard}><Text style={styles.overline}>КОНТАКТНЫЕ ДАННЫЕ</Text><Text style={styles.infoPrimary}>{account.email}</Text><View style={styles.hairline}/><Text style={styles.overline}>СТАТУС ЗАЯВКИ</Text><Text style={styles.infoPrimary}>Подтверждена · Демо-режим</Text></View>
  <View style={styles.infoCard}><Text style={styles.sectionLabel}>ПЕРСОНАЛЬНЫЕ ДАННЫЕ ИГРОКА</Text>
