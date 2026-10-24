@@ -31,6 +31,10 @@ jobs:
           CI: '1'
           EXPO_NO_DOTENV: '1'
       - run: python3 tests/check_web_build.py
+      - name: Publish S Kem Pobuhat demo
+        run: |
+          mkdir -p dist/web/s-kem-pobuhat
+          cp public-demos/s-kem-pobuhat/index.html dist/web/s-kem-pobuhat/index.html
       - name: Publish club branding images
         run: |
           mkdir -p dist/web/branding
