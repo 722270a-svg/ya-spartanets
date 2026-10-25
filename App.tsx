@@ -36,7 +36,7 @@ export default function App(){
  const [screenHistory,setScreenHistory]=useState<Screen[]>([]);
  const navigate=(to:Screen)=>{setScreen(prev=>{if(prev!==to)setScreenHistory(h=>[...h,prev]);return to;});};
  const goBack=()=>{if(screenHistory.length){setScreen(screenHistory[screenHistory.length-1]);setScreenHistory(h=>h.slice(0,-1));}else setScreen('home');};
- const goHome=()=>navigate('home');
+ const goHome=()=>{setScreen('home');setScreenHistory([]);setEntryKind(null);setEntryRole(null);setPlayerUnit(null);setOnboardingDone(false);setName('');setEmail('');void saveAccount(null);};
  const [matchTab,setMatchTab]=useState<'all'|'wins'|'losses'|'favorites'>('all');
  const [selectedMatch,setSelectedMatch]=useState<string|null>(null);
  const [matchFavorites,setMatchFavorites]=useState<string[]>([]);
