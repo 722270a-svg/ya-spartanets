@@ -63,6 +63,19 @@ jobs:
               raise RuntimeError(f'Expected 40 player photos; extracted only {count}')
           print(f'Published {count} player portraits to {destination}')
           PY
+      - name: Publish verified source-table 2026 game statistics
+        run: |
+          python3 - <<'PY'
+          import base64, zlib, json
+          from pathlib import Path
+          packed = Path('src/data/spartans-2026-stats.deflate.b64').read_text().strip()
+          records = json.loads(zlib.decompress(base64.b64decode(packed)))
+          assert len(records) == 10, f'Expected 10 match tabs, got {len(records)}'
+          target = Path('dist/web/data/spartans-2026.json')
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(json.dumps(records, ensure_ascii=False), encoding='utf-8')
+          print(f'Published {len(records)} match tables to {target}')
+          PY
       - name: Keep Expo asset directories on Pages
         run: touch dist/web/.nojekyll
       - uses: actions/upload-pages-artifact@v3
