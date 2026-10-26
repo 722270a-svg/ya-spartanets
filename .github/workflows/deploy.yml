@@ -39,6 +39,30 @@ jobs:
         run: |
           mkdir -p dist/web/branding
           if [ -d assets/branding ]; then cp assets/branding/* dist/web/branding/; fi
+      - name: Publish player portraits from uploaded ZIP
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import shutil
+          archive = Path('Spartans_Photos_For_GitHub (1).zip')
+          destination = Path('dist/web/player-photos')
+          destination.mkdir(parents=True, exist_ok=True)
+          count = 0
+          with ZipFile(archive) as z:
+              for member in z.infolist():
+                  basename = Path(member.filename).name
+                  if not member.is_dir() and basename.lower().endswith('.webp') and basename.startswith('photo_'):
+                      target = destination / basename
+                      if target.exists():
+                          raise RuntimeError(f'Duplicate player photo: {basename}')
+                      with z.open(member) as source, target.open('wb') as output:
+                          shutil.copyfileobj(source, output)
+                      count += 1
+          if count < 40:
+              raise RuntimeError(f'Expected 40 player photos; extracted only {count}')
+          print(f'Published {count} player portraits to {destination}')
+          PY
       - name: Keep Expo asset directories on Pages
         run: touch dist/web/.nojekyll
       - uses: actions/upload-pages-artifact@v3
