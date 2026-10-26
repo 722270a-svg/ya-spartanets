@@ -30,6 +30,8 @@ jobs:
         env:
           CI: '1'
           EXPO_NO_DOTENV: '1'
+          EXPO_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
       - run: python3 tests/check_web_build.py
       - name: Publish S Kem Pobuhat demo
         run: |
