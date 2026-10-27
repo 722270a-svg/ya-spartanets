@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import {ScrollView,Text,TextInput,TouchableOpacity,View,ActivityIndicator} from 'react-native';
-const base=(process.env.EXPO_PUBLIC_SUPABASE_URL||'').replace(/\/$/,'');
-const key=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'';
+const base=(process.env.EXPO_PUBLIC_SUPABASE_URL||'https://hqgoosnzjwpttygdbnzr.supabase.co').replace(/\/$/,'');
+const key=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'sb_publishable_cngrbDtdgADG8Pt5rTDRqA_AMzZuy7V';
 const gold='#DEB967';
 type Field='full_name'|'phone'|'vk_account'|'telegram_account'|'height_cm'|'weight_kg'|'sports_history';
 export default function RecruitApplication({onBack}:{onBack:()=>void}){
