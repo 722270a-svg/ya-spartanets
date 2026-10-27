@@ -10,6 +10,7 @@ type Profile={id:string;role:'player'|'coach'|'admin';full_name:string;position:
 const C='#DEB967',B='#191919';
 const fmt=(v:unknown)=>v===null||v===undefined||v===''?'Не указано':String(v);
 export default function SecureClub({onBack}:{onBack:()=>void}){
+ const [applications,setApplications]=useState<any[]|null>(null),[applicationError,setApplicationError]=useState(''),[sessionToken,setSessionToken]=useState('');
  const [demo,setDemo]=useState(false),[demoFlags,setDemoFlags]=useState([false,false,false,false]);
  const [login,setLogin]=useState(''),[password,setPassword]=useState(''),[profile,setProfile]=useState<Profile|null>(null),[loading,setLoading]=useState(false),[error,setError]=useState('');
  const line=(label:string,value:unknown)=><View style={{paddingVertical:10,borderBottomWidth:1,borderColor:'#383027'}}><Text style={{color:'#A5A5A5',fontSize:12}}>{label}</Text><Text style={{color:'white',fontSize:16,marginTop:4}}>{fmt(value)}</Text></View>;
@@ -25,11 +26,12 @@ export default function SecureClub({onBack}:{onBack:()=>void}){
      if(!details.ok)throw new Error('Не удалось получить профиль. Обратитесь к администратору.');
      const rows=await details.json();
      if(!Array.isArray(rows)||rows.length!==1)throw new Error('Личный профиль ещё не назначен администратором.');
-     setProfile(rows[0] as Profile);setPassword('');
+     setProfile(rows[0] as Profile);setSessionToken(response.access_token);setPassword('');
    }catch(e){setError(e instanceof Error?e.message:'Ошибка соединения');}
    finally{setLoading(false);}
  }
  const demoLine=(label:string,value:string)=><View style={{paddingVertical:10,borderBottomWidth:1,borderColor:'#383027'}}><Text style={{color:'#A5A5A5',fontSize:12}}>{label}</Text><Text style={{color:'white',fontSize:16,marginTop:4}}>{value}</Text></View>;
+ async function loadApplications(){if(profile?.role!=='admin'||!sessionToken)return;setApplicationError('');try{const r=await fetch(base+'/rest/v1/recruit_applications?select=*&order=created_at.desc',{headers:{apikey:anon,Authorization:'Bearer '+sessionToken}});if(!r.ok)throw Error('Ошибка загрузки заявок');const list=await r.json();setApplications(Array.isArray(list)?list:[]);}catch(e){setApplicationError(e instanceof Error?e.message:'Нет связи');}}
  return <ScrollView contentContainerStyle={{padding:22,gap:15,backgroundColor:'#101010',minHeight:'100%'}}>
   <TouchableOpacity accessibilityRole="button" onPress={onBack}><Text style={{color:C}}>← На главную</Text></TouchableOpacity>
   <Text style={{color:C,fontWeight:'700',fontSize:14}}>МОСКОВСКИЕ СПАРТАНЦЫ</Text>
@@ -42,6 +44,7 @@ export default function SecureClub({onBack}:{onBack:()=>void}){
    <TouchableOpacity accessibilityRole="button" onPress={()=>setDemo(true)} style={{borderWidth:1,borderColor:C,padding:15,alignItems:'center',backgroundColor:'#30261a'}}><Text style={{color:C,fontWeight:'700'}}>ПОСМОТРЕТЬ ПРОТОТИП АРСЕНИЯ ЯРЕМКО →</Text></TouchableOpacity>
    <Text style={{color:'#888',fontSize:12}}>Логины выдаёт администратор. Никогда не вводите пароль в демонстрационную форму регистрации.</Text>
   </>:<>
+   {profile.role==='admin'&&<View style={{gap:12,padding:12,borderColor:C,borderWidth:1}}><Text style={{color:C,fontWeight:'700',fontSize:18}}>ЗАЯВКИ В КОМАНДУ · ТОЛЬКО АДМИНИСТРАТОР</Text><TouchableOpacity onPress={loadApplications} style={{padding:13,backgroundColor:'#604922',alignItems:'center'}}><Text style={{color:'white'}}>ЗАГРУЗИТЬ ЗАЯВКИ</Text></TouchableOpacity>{!!applicationError&&<Text style={{color:'#f99'}}>{applicationError}</Text>}{applications?.map(a=><View key={a.id} style={{padding:12,backgroundColor:'#28241d',gap:6}}><Text style={{color:C,fontSize:17}}>{a.full_name}</Text><Text style={{color:'white'}}>Телефон: {a.phone}</Text><Text style={{color:'white'}}>ВКонтакте: {a.vk_account||'—'}</Text><Text style={{color:'white'}}>Telegram: {a.telegram_account||'—'}</Text><Text style={{color:'white'}}>Рост / вес: {a.height_cm||'—'} / {a.weight_kg||'—'}</Text><Text style={{color:'white'}}>Спортивный опыт: {a.sports_history||'—'}</Text><Text style={{color:'white'}}>Американский футбол: {a.american_football_experience==='yes'?'Да':'Нет'} · Флаг-футбол: {a.flag_football_experience==='yes'?'Да':'Нет'}</Text><Text style={{color:'#aaa'}}>{a.created_at}</Text></View>)}</View>}
    {profile.photo_url?.startsWith('https://722270a-svg.github.io/ya-spartanets/player-photos/')&&<Image source={{uri:profile.photo_url}} resizeMode="contain" style={{height:210,width:180,alignSelf:'center'}}/>}
    {line('ФИО',profile.full_name)}
    {line('Роль',profile.role==='player'?'Игрок':profile.role==='coach'?'Тренер':'Администрация')}
@@ -59,7 +62,7 @@ export default function SecureClub({onBack}:{onBack:()=>void}){
    {line('Согласие на обработку',profile.data_processing_consent?'Отмечено':'Не отмечено')}
    {line('Страховка',profile.insurance_complete?'Отмечено':'Не отмечено')}
    <Text style={{color:'#A5A5A5'}}>Отметки отображаются из закрытой базы и не могут меняться через браузер без подтверждения администратора.</Text>
-   <TouchableOpacity accessibilityRole="button" onPress={()=>{setProfile(null);setLogin('');setPassword('');setError('')}} style={{borderWidth:1,borderColor:C,padding:15,alignItems:'center'}}><Text style={{color:C}}>ВЫЙТИ ИЗ КАБИНЕТА</Text></TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" onPress={()=>{setProfile(null);setSessionToken('');setApplications(null);setLogin('');setPassword('');setError('')}} style={{borderWidth:1,borderColor:C,padding:15,alignItems:'center'}}><Text style={{color:C}}>ВЫЙТИ ИЗ КАБИНЕТА</Text></TouchableOpacity>
   </>}
  </ScrollView>
 }
