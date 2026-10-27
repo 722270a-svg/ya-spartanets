@@ -78,6 +78,25 @@ jobs:
           target.write_text(json.dumps(records, ensure_ascii=False), encoding='utf-8')
           print(f'Published {len(records)} match tables to {target}')
           PY
+      - name: Publish individual HD merchandise photos
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          archive=Path('spartans_merch_photos_hd.zip')
+          destination=Path('dist/web/merch-photos')
+          destination.mkdir(parents=True,exist_ok=True)
+          if archive.exists():
+              expected={'long-white','pants-black','hoodie-black','zip-black','shorts-black','shirt-oversize','shirt-regular'}
+              with ZipFile(archive) as z:
+                  names={Path(n).stem:n for n in z.namelist() if n.endswith('.webp')}
+                  if set(names)!=expected: raise RuntimeError(f'Invalid merchandise archive: {set(names)}')
+                  for stem,member in names.items():
+                      (destination/(stem+'.webp')).write_bytes(z.read(member))
+              print('Published seven HD merchandise images')
+          else:
+              print('HD archive not uploaded yet: retaining existing picture fallback')
+          PY
       - name: Keep Expo asset directories on Pages
         run: touch dist/web/.nojekyll
       - uses: actions/upload-pages-artifact@v3
