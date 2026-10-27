@@ -1,4 +1,5 @@
 import React,{useState} from 'react';
+import {MERCH_SPRITE} from './merchPhotoSprite';
 import {View,Text,TextInput,TouchableOpacity,ActivityIndicator,ScrollView,Image} from 'react-native';
 const GOLD='#DEB967',BG='#1C1A17',API='https://hqgoosnzjwpttygdbnzr.supabase.co',KEY='sb_publishable_cngrbDtdgADG8Pt5rTDRqA_AMzZuy7V';
 export const products=[
@@ -25,7 +26,7 @@ export default function MerchShop(){
  <Text style={{color:GOLD,fontSize:22,fontWeight:'700'}}>Клубная коллекция</Text>
  <Text style={{color:'#cbbda6'}}>Выбери размер, добавь товары в корзину и оформи заказ прямо в приложении. Размеры следует уточнять у клуба — информация о доступности размеров в исходной форме не указана.</Text>
  {products.map((p,i)=><View key={p.id} style={{backgroundColor:BG,borderWidth:1,borderColor:'#715B39',borderRadius:16,padding:14,gap:12}}>
- <View style={{height:220,backgroundColor:'#32302c',borderRadius:10,overflow:'hidden',justifyContent:'center',alignItems:'center'}}><Text style={{color:GOLD,fontSize:50}}>♜</Text><Text style={{color:'#C4AF89',fontSize:12}}>Фото товара · {i+1}</Text></View>
+ <View style={{height:220,backgroundColor:'#e5e3df',borderRadius:10,overflow:'hidden',alignItems:'center',justifyContent:'flex-start'}}><Image source={{uri:MERCH_SPRITE}} resizeMode="stretch" style={{position:'absolute',top:-i*220,width:220,height:1540}} accessibilityLabel={'Фото: '+p.name}/></View>
  <Text style={{color:'#fff',fontWeight:'700',fontSize:18}}>{p.name}</Text>
  <Text style={{color:GOLD,fontWeight:'700',fontSize:23}}>{fmt(p.price)}</Text>
  <Text style={{color:'#ccc'}}>Размер</Text>
