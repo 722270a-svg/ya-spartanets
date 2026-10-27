@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
 import {MERCH_SPRITE} from './merchPhotoSprite';
+const PHOTO_BASE='https://722270a-svg.github.io/ya-spartanets/merch-photos/';
 import {View,Text,TextInput,TouchableOpacity,ActivityIndicator,ScrollView,Image} from 'react-native';
 const GOLD='#DEB967',BG='#1C1A17',API='https://hqgoosnzjwpttygdbnzr.supabase.co',KEY='sb_publishable_cngrbDtdgADG8Pt5rTDRqA_AMzZuy7V';
 export const products=[
@@ -16,6 +17,7 @@ const sizes=['XS','S','M','L','XL','XXL','3XL'];
 const fmt=(n:number)=>n.toLocaleString('ru-RU')+' ₽';
 const field={borderWidth:1,borderColor:'#665535',backgroundColor:'#201D18',color:'#fff',padding:13,borderRadius:9} as const;
 export default function MerchShop(){
+ const [photoFailed,setPhotoFailed]=useState<Record<string,boolean>>({});
  const [selected,setSelected]=useState<Record<string,string>>({}),[cart,setCart]=useState<CartItem[]>([]),[checkout,setCheckout]=useState(false),[name,setName]=useState(''),[contact,setContact]=useState(''),[social,setSocial]=useState(''),[notes,setNotes]=useState(''),[agree,setAgree]=useState(false),[loading,setLoading]=useState(false),[error,setError]=useState(''),[complete,setComplete]=useState(false);
  const sum=cart.reduce((total,c)=>total+(products.find(p=>p.id===c.id)?.price||0)*c.qty,0);
  const add=(id:string)=>{const size=selected[id];if(!size){setError('Сначала выберите размер изделия.');return;}setError('');setCart(old=>{const i=old.findIndex(x=>x.id===id&&x.size===size);return i<0?[...old,{id,size,qty:1}]:old.map((x,j)=>j===i?{...x,qty:x.qty+1}:x)});};
@@ -26,7 +28,7 @@ export default function MerchShop(){
  <Text style={{color:GOLD,fontSize:22,fontWeight:'700'}}>Клубная коллекция</Text>
  <Text style={{color:'#cbbda6'}}>Выбери размер, добавь товары в корзину и оформи заказ прямо в приложении. Размеры следует уточнять у клуба — информация о доступности размеров в исходной форме не указана.</Text>
  {products.map((p,i)=><View key={p.id} style={{backgroundColor:BG,borderWidth:1,borderColor:'#715B39',borderRadius:16,padding:14,gap:12}}>
- <View style={{height:220,backgroundColor:'#e5e3df',borderRadius:10,overflow:'hidden',alignItems:'center',justifyContent:'flex-start'}}><Image source={{uri:MERCH_SPRITE}} resizeMode="stretch" style={{position:'absolute',top:-i*220,width:220,height:1540}} accessibilityLabel={'Фото: '+p.name}/></View>
+ <View style={{height:220,backgroundColor:'#e5e3df',borderRadius:10,overflow:'hidden',alignItems:'center',justifyContent:'flex-start'}}>{photoFailed[p.id]?<Image source={{uri:MERCH_SPRITE}} resizeMode="stretch" style={{position:'absolute',top:-i*220,width:220,height:1540}} accessibilityLabel={'Фото: '+p.name}/>:<Image source={{uri:PHOTO_BASE+p.id+'.webp'}} onError={()=>setPhotoFailed(v=>({...v,[p.id]:true}))} resizeMode="contain" style={{width:'100%',height:'100%'}} accessibilityLabel={'Фото: '+p.name}/>}</View>
  <Text style={{color:'#fff',fontWeight:'700',fontSize:18}}>{p.name}</Text>
  <Text style={{color:GOLD,fontWeight:'700',fontSize:23}}>{fmt(p.price)}</Text>
  <Text style={{color:'#ccc'}}>Размер</Text>
