@@ -28,8 +28,8 @@ export default function RecruitApplication({onBack}:{onBack:()=>void}){
  {input('Номер телефона *','phone','+7 ...')}
  {input('Аккаунт ВКонтакте','vk_account','Ссылка или @имя')}
  {input('Аккаунт Telegram','telegram_account','@имя')}
- {input('Рост, см','height_cm')}
- {input('Вес, кг','weight_kg')}
+ {input('Рост, см','height_cm','Например, 178 см')}
+ {input('Вес, кг','weight_kg','Например, 85 кг')}
  {input('Какими видами спорта занимались?','sports_history','Расскажите о спортивном опыте')}
  {options('Есть опыт игры в американский футбол? *',american,setAmerican)}
  {options('Есть опыт игры во флаг-футбол? *',flag,setFlag)}
