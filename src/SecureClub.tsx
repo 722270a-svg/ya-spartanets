@@ -4,8 +4,8 @@ import {View,Text,TextInput,TouchableOpacity,ScrollView,ActivityIndicator,Image}
 // Configure through EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY.
 // This is a separate, server-verified members area. No password or personal
 // roster information is bundled into the static app.
-const base=(process.env.EXPO_PUBLIC_SUPABASE_URL||'').replace(/\/$/,'');
-const anon=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'';
+const base=(process.env.EXPO_PUBLIC_SUPABASE_URL||'https://hqgoosnzjwpttygdbnzr.supabase.co').replace(/\/$/,'');
+const anon=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'sb_publishable_cngrbDtdgADG8Pt5rTDRqA_AMzZuy7V';
 type Profile={id:string;role:'player'|'coach'|'admin';full_name:string;position:string|null;jersey_number:string|null;birth_date:string|null;height_cm:number|null;weight_kg:number|null;jersey_size:string|null;breeches_size:string|null;tshirt_size:string|null;shorts_size:string|null;photo_url:string|null;medical_exam_complete:boolean;rusada_complete:boolean;data_processing_consent:boolean;insurance_complete:boolean};
 const C='#DEB967',B='#191919';
 const fmt=(v:unknown)=>v===null||v===undefined||v===''?'Не указано':String(v);
