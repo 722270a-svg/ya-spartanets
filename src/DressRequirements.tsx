@@ -36,6 +36,15 @@ const sets:{title:string;description:string;items:Item[]}[]=[
  {name:'Кеды или кроссовки',query:'кроссовки повседневные мужские черные'},
  {name:'Кепка чёрная',query:'кепка черная мужская'}]}
 ];
+const casualMerch=[
+ {name:'Лонгслив белый (оверсайз)',price:2990},
+ {name:'Штаны чёрные',price:3490},
+ {name:'Худи чёрный (оверсайз)',price:4490},
+ {name:'Кофта на молнии чёрная (оверсайз)',price:4490},
+ {name:'Шорты чёрные',price:3490},
+ {name:'Футболка чёрная (оверсайз)',price:2290},
+ {name:'Футболка чёрная (стандарт)',price:2490}
+];
 const accessories:Item[]=[{name:'Бутылка для воды',query:'бутылка спортивная для воды'},{name:'Спортивная сумка',query:'сумка спортивная черная'}];
 export default function DressRequirements(){
  const [open,setOpen]=useState(false),[tab,setTab]=useState(0),[showAccessories,setShowAccessories]=useState(false);
@@ -65,10 +74,14 @@ export default function DressRequirements(){
  <TouchableOpacity accessibilityRole="link" onPress={()=>Linking.openURL(CASUAL_FORM)} style={{backgroundColor:GOLD,borderRadius:9,padding:15,alignItems:'center'}}>
  <Text style={{color:'#17130A',fontWeight:'700'}}>ОТКРЫТЬ КАТАЛОГ И ФОРМУ ЗАКАЗА ↗</Text>
  </TouchableOpacity>
- <Text style={{color:'#b8ad9e',fontSize:12,lineHeight:19}}>Оригинальную форму открываем отдельно: её внутренние карточки и цены пока не удалось получить для точного переноса в приложение. Ниже — общие варианты casual, не ассортимент этой формы.</Text>
+ <Text style={{color:'#b8ad9e',fontSize:12,lineHeight:19}}>Товары и цены по PDF «Заказ мерча Спартанцы Медиа Лига» от 27.10.2026. Для выбора размера и оформления заказа откройте форму. Фотографии оригинальных товаров показаны в форме ниже.</Text>
+ <View style={{gap:9}}>{casualMerch.map((item,i)=><View key={i} style={{backgroundColor:'#171717',borderWidth:1,borderColor:'#6B5636',borderRadius:12,padding:13,gap:7}}><Text style={{color:'#BA9860',fontSize:11,letterSpacing:1}}>SPARTANS · {String(i+1).padStart(2,'0')}</Text><Text style={{color:'#fff',fontSize:16,fontWeight:'700'}}>{item.name}</Text><Text style={{color:GOLD,fontSize:20,fontWeight:'700'}}>{item.price.toLocaleString('ru-RU')} ₽</Text><TouchableOpacity accessibilityRole="link" onPress={()=>Linking.openURL(CASUAL_FORM)} style={{alignSelf:'flex-start',borderWidth:1,borderColor:GOLD,borderRadius:7,paddingHorizontal:12,paddingVertical:9}}><Text style={{color:GOLD,fontWeight:'700'}}>ВЫБРАТЬ И ЗАКАЗАТЬ ↗</Text></TouchableOpacity></View>)}</View>
+ <Text style={{color:GOLD,fontSize:14,fontWeight:'700'}}>Фотографии товаров и форма заявки</Text>
+ <Text style={{color:'#ccc',fontSize:12}}>Здесь отображается оригинальная Google-форма с фотографиями каждого изделия. Если она не открылась, используйте кнопку «Открыть каталог и форму заказа» выше.</Text>
  </View>}
  {!showAccessories&&tab<=1&&<View style={{flexDirection:'row',gap:8,alignItems:'center'}}>{tab===0&&<Image source={blackUniform} resizeMode="contain" style={{width:145,height:235}}/>}<View style={{width:64,height:75,borderColor:GOLD,borderWidth:1,backgroundColor:tab===0?'#090909':'#AD925D',alignItems:'center',justifyContent:'center'}}><Text style={{fontSize:28,color:tab===0?GOLD:'#111'}}>71</Text></View><Text style={{color:'#aaa',flex:1}}>Цветовая схема: чёрный + золото. Образец чёрной формы показан слева. Золотая форма пока без фото.</Text></View>}
  {(showAccessories?accessories:sets[tab].items).map(itemRow)}
+ {!showAccessories&&tab===3&&<View style={{height:690,overflow:'hidden',borderRadius:10,borderColor:'#75603c',borderWidth:1}}>{React.createElement('iframe' as any,{src:CASUAL_FORM.replace('viewform?pli=1','viewform?embedded=true'),title:'Заказ мерча Спартанцы Медиа Лига',style:{width:'100%',height:'100%',border:0,backgroundColor:'#fff'}})}</View>}
  <Text style={{color:'#bcb2a1',fontSize:12}}>По вопросам заказа: сообщество «Московские Спартанцы» во ВКонтакте. Контакт конкретного ответственного пока не указан.</Text>
  </View>}
  </View>
