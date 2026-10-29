@@ -13,7 +13,7 @@ export default function RunningClub(){
  const button=(text:string,act:()=>void,outline=false)=><TouchableOpacity accessibilityRole="button" onPress={act} style={{padding:14,borderRadius:9,alignItems:'center',backgroundColor:outline?'transparent':GOLD,borderColor:GOLD,borderWidth:1}}><Text style={{color:outline?GOLD:'#17110A',fontWeight:'700'}}>{text}</Text></TouchableOpacity>;
  const verified=member?.runs.filter(r=>r.status==='verified').reduce((a,r)=>a+r.km,0)||0;
  const pending=member?.runs.filter(r=>r.status==='pending').reduce((a,r)=>a+r.km,0)||0;
- async function selectProof(){try{const v=await DocumentPicker.getDocumentAsync({type:['image/*'],copyToCache:true});if(!v.canceled&&v.assets?.[0]){setProof(v.assets[0].name);setError('')}}catch{setError('Не удалось выбрать скриншот')}}
+ async function selectProof(){try{const v=await DocumentPicker.getDocumentAsync({type:['image/*'],copyToCacheDirectory:true});if(!v.canceled&&v.assets?.[0]){setProof(v.assets[0].name);setError('')}}catch{setError('Не удалось выбрать скриншот')}}
  function addRun(){const v=Number(km.replace(',','.'));if(!Number.isFinite(v)||v<=0||v>250){setError('Укажите дистанцию от 0,01 до 250 км');return}if(!proof){setError('Прикрепите скриншот тренировки с часов');return}if(!member)return;const run:Run={id:String(Date.now())+'-'+String(Math.random()).slice(2),date:new Date().toISOString().slice(0,10),km:Math.round(v*100)/100,proofName:proof,status:'pending'};save({...member,runs:[run,...member.runs]});setKm('');setProof('');setError('');}
  return <View style={{gap:16}}>
  <Text style={{color:GOLD,fontSize:24,fontWeight:'700'}}>БЕГОВОЙ КЛУБ «СПАРТАНЦЫ»</Text>
