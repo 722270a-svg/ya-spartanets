@@ -6,7 +6,8 @@ import base64, json
 root=Path('dist/web')
 root.mkdir(parents=True,exist_ok=True)
 source=Path('assets/branding/pwa-logo.webp.base64')
-logo=Image.open(BytesIO(base64.b64decode(source.read_text().strip()))).convert('RGB')
+logo_path=Path('assets/branding/logo-entry.png')
+logo=Image.open(logo_path if logo_path.exists() else BytesIO(base64.b64decode(source.read_text().strip()))).convert('RGB')
 # The full black square is part of the supplied logo; do not crop or recolour.
 for size,filename in ((32,'favicon.png'),(180,'apple-touch-icon.png'),(192,'icon-192.png'),(512,'icon-512.png')):
     logo.resize((size,size),Image.Resampling.LANCZOS).save(root/filename,optimize=True)
@@ -48,4 +49,4 @@ import re
 html=re.sub(r'<meta[^>]+name=["\\\']viewport["\\\'][^>]*>', '', html, flags=re.I)
 html=html.replace('</head>',head+'\n</head>')
 index.write_text(html,encoding='utf-8')
-print('PWA icons and manifest published using the supplied Spartans logo')
+print('PWA icons and manifest generated from exact supplied transparent Spartans PNG')
