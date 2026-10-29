@@ -97,6 +97,10 @@ jobs:
           else:
               print('HD archive not uploaded yet: retaining existing picture fallback')
           PY
+      - name: Install image processor for home-screen icons
+        run: python3 -m pip install --quiet Pillow
+      - name: Generate official Spartans PWA home-screen icons
+        run: python3 scripts/setup_pwa.py
       - name: Keep Expo asset directories on Pages
         run: touch dist/web/.nojekyll
       - uses: actions/upload-pages-artifact@v3
