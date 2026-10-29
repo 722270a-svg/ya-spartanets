@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import {MERCH_SPRITE} from './merchPhotoSprite';
 const PHOTO_BASE='https://722270a-svg.github.io/ya-spartanets/merch-photos/';
-import {View,Text,TextInput,TouchableOpacity,ActivityIndicator,ScrollView,Image} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,ActivityIndicator,ScrollView,Image,Modal} from 'react-native';
 const GOLD='#DEB967',BG='#1C1A17',API='https://hqgoosnzjwpttygdbnzr.supabase.co',KEY='sb_publishable_cngrbDtdgADG8Pt5rTDRqA_AMzZuy7V';
 export const products=[
  {id:'long-white',name:'Лонгслив белый (оверсайз)',price:2990},
@@ -17,6 +17,7 @@ const sizes=['XS','S','M','L','XL','XXL','3XL'];
 const fmt=(n:number)=>n.toLocaleString('ru-RU')+' ₽';
 const field={borderWidth:1,borderColor:'#665535',backgroundColor:'#201D18',color:'#fff',padding:13,borderRadius:9} as const;
 export default function MerchShop(){
+ const [zoomPhoto,setZoomPhoto]=useState<string|null>(null);
  const [photoFailed,setPhotoFailed]=useState<Record<string,boolean>>({});
  const [selected,setSelected]=useState<Record<string,string>>({}),[cart,setCart]=useState<CartItem[]>([]),[checkout,setCheckout]=useState(false),[name,setName]=useState(''),[contact,setContact]=useState(''),[social,setSocial]=useState(''),[notes,setNotes]=useState(''),[agree,setAgree]=useState(false),[loading,setLoading]=useState(false),[error,setError]=useState(''),[complete,setComplete]=useState(false);
  const sum=cart.reduce((total,c)=>total+(products.find(p=>p.id===c.id)?.price||0)*c.qty,0);
@@ -24,11 +25,11 @@ export default function MerchShop(){
  const quantity=(id:string,size:string,change:number)=>setCart(v=>v.map(x=>x.id===id&&x.size===size?{...x,qty:x.qty+change}:x).filter(x=>x.qty>0));
  async function submit(){setError('');if(!name.trim()||!contact.trim()||!agree){setError('Укажите имя, контакт и согласие на обработку данных.');return;}setLoading(true);try{const items=cart.map(x=>{const p=products.find(v=>v.id===x.id)!;return {id:p.id,name:p.name,price:p.price,size:x.size,qty:x.qty};});const r=await fetch(API+'/rest/v1/merch_orders',{method:'POST',headers:{apikey:KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({customer_name:name.trim(),contact:contact.trim(),social:social.trim()||null,notes:notes.trim()||null,items})});if(!r.ok)throw Error('Не удалось отправить заказ. Проверьте соединение и попробуйте снова.');setComplete(true);setCart([]);}catch(e){setError(e instanceof Error?e.message:'Ошибка отправки');}finally{setLoading(false);}}
  if(complete)return <View style={{backgroundColor:'#272318',padding:18,borderRadius:14,gap:10}}><Text style={{color:GOLD,fontSize:23,fontWeight:'700'}}>Заказ отправлен ✓</Text><Text style={{color:'#fff'}}>Заказ передан в закрытый кабинет администратора. С вами свяжутся по указанным контактам.</Text><TouchableOpacity onPress={()=>{setComplete(false);setCheckout(false);setAgree(false);}}><Text style={{color:GOLD}}>Оформить ещё один заказ →</Text></TouchableOpacity></View>;
- return <View style={{gap:15}}>
+ return <View style={{gap:15}}><Modal visible={zoomPhoto!==null} transparent animationType="fade" onRequestClose={()=>setZoomPhoto(null)}><View style={{flex:1,backgroundColor:'rgba(0,0,0,0.96)',justifyContent:'center',padding:12}}><TouchableOpacity accessibilityRole="button" onPress={()=>setZoomPhoto(null)} style={{alignSelf:'flex-end',padding:18}}><Text style={{color:'#fff',fontSize:24}}>✕ Закрыть</Text></TouchableOpacity>{zoomPhoto&&<Image source={{uri:PHOTO_BASE+zoomPhoto+'.webp'}} resizeMode="contain" style={{width:'100%',flex:1}}/>}</View></Modal>
  <Text style={{color:GOLD,fontSize:22,fontWeight:'700'}}>Клубная коллекция</Text>
  <Text style={{color:'#cbbda6'}}>Выбери размер, добавь товары в корзину и оформи заказ прямо в приложении. Размеры следует уточнять у клуба — информация о доступности размеров в исходной форме не указана.</Text>
  {products.map((p,i)=><View key={p.id} style={{backgroundColor:BG,borderWidth:1,borderColor:'#715B39',borderRadius:16,padding:14,gap:12}}>
- <View style={{height:220,backgroundColor:'#e5e3df',borderRadius:10,overflow:'hidden',alignItems:'center',justifyContent:'flex-start'}}>{photoFailed[p.id]?<Image source={{uri:MERCH_SPRITE}} resizeMode="stretch" style={{position:'absolute',top:-i*220,width:220,height:1540}} accessibilityLabel={'Фото: '+p.name}/>:<Image source={{uri:PHOTO_BASE+p.id+'.webp'}} onError={()=>setPhotoFailed(v=>({...v,[p.id]:true}))} resizeMode="contain" style={{width:'100%',height:'100%'}} accessibilityLabel={'Фото: '+p.name}/>}</View>
+ <TouchableOpacity accessibilityRole="button" accessibilityLabel={'Увеличить фото '+p.name} onPress={()=>setZoomPhoto(p.id)} style={{height:220,backgroundColor:'#e5e3df',borderRadius:10,overflow:'hidden',alignItems:'center',justifyContent:'flex-start'}}>{photoFailed[p.id]?<Image source={{uri:MERCH_SPRITE}} resizeMode="stretch" style={{position:'absolute',top:-i*220,width:220,height:1540}} accessibilityLabel={'Фото: '+p.name}/>:<Image source={{uri:PHOTO_BASE+p.id+'.webp'}} onError={()=>setPhotoFailed(v=>({...v,[p.id]:true}))} resizeMode="contain" style={{width:'100%',height:'100%'}} accessibilityLabel={'Фото: '+p.name}/>}</View>
  <Text style={{color:'#fff',fontWeight:'700',fontSize:18}}>{p.name}</Text>
  <Text style={{color:GOLD,fontWeight:'700',fontSize:23}}>{fmt(p.price)}</Text>
  <Text style={{color:'#ccc'}}>Размер</Text>
