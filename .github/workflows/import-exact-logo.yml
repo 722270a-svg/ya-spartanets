@@ -19,12 +19,13 @@ jobs:
           mkdir -p assets/branding
           curl --fail --location --silent --show-error --max-time 60 'https://at.adobe.com/j7B5vUFVsBFigoXu' -o assets/branding/logo-entry.png
           python3 - <<'PY'
-          from PIL import Image
+          import struct
           p='assets/branding/logo-entry.png'
-          im=Image.open(p)
-          assert im.format=='PNG',f'Expected PNG, got {im.format}'
-          assert im.width>=400 and im.height>=400,im.size
-          print('Imported exact source PNG', im.size)
+          data=open(p,'rb').read()
+          assert data[:8]==bytes.fromhex('89504e470d0a1a0a'), 'Download did not return a PNG'
+          width,height=struct.unpack('>II',data[16:24])
+          assert width>=400 and height>=400,(width,height)
+          print('Imported exact source PNG',width,height)
           PY
       - name: Commit original logo to repository
         run: |
