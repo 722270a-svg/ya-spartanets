@@ -37,6 +37,15 @@ head='''<link rel="manifest" href="/ya-spartanets/manifest.webmanifest?v=2026102
 <meta name="theme-color" content="#000000">'''
 if '</head>' not in html:
     raise RuntimeError('Expo HTML has no head element')
+head += '''<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<style>
+html,body,#root{max-width:100%;overflow-x:hidden!important;overscroll-behavior-x:none;}
+html,body{margin:0;width:100%;touch-action:pan-y;}
+*,*::before,*::after{box-sizing:border-box;}
+img{max-width:100%;}
+</style>'''
+import re
+html=re.sub(r'<meta[^>]+name=["\\\']viewport["\\\'][^>]*>', '', html, flags=re.I)
 html=html.replace('</head>',head+'\n</head>')
 index.write_text(html,encoding='utf-8')
 print('PWA icons and manifest published using the supplied Spartans logo')
